@@ -88,7 +88,7 @@ function EnergyCalculatorGrid() {
                     onChange={(e) =>
                       setApplianceVariation(index, e.target.value)
                     }
-                    className="w-full font-semibold rounded-lg p-2 text-sm border border-zinc-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full font-semibold rounded-lg p-2 text-sm border-zinc-300 focus:ring-2 focus:ring-blue-500 outline-none"
                   >
                     {appliance.variation.map((c) => (
                       <option key={c.type} value={c.type}>
@@ -111,7 +111,7 @@ function EnergyCalculatorGrid() {
                   Number(appliance.quantity) <= 0 ? "" : appliance.quantity
                 }
                 onChange={(e) => setApplianceQuantity(index, e.target.value)}
-                className="border border-zinc-300 rounded-lg p-2 text-sm placeholder:text-zinc-400  focus:ring-2 focus:ring-blue-500 outline-none"
+                className="border border-zinc-300 font-semibold rounded-lg p-2 placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-500 outline-none"
               />
 
               {/* Power */}
