@@ -1,4 +1,4 @@
-import initialAppliances from "@/constants/initialAppliances";
+import initialAppliances from "@/src/constants/initialAppliances";
 import { AppState } from "./AppState";
 
 export type Action =

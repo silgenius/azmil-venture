@@ -1,4 +1,6 @@
-import initialAppliances, { Appliance } from "@/constants/initialAppliances";
+import initialAppliances, {
+  Appliance,
+} from "@/src/constants/initialAppliances";
 
 export interface AppState {
   app: {
