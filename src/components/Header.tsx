@@ -79,10 +79,10 @@ function Header() {
         </div>
 
         <nav className="flex flex-col space-y-6 px-6 text-lg font-semibold">
-          <a href="#">Home</a>
-          <a href="#">Products</a>
-          <a href="#">About Us</a>
-          <a href="#">Energy Calculator</a>
+          <Link href="/home">Home</Link>
+          <Link href="/products">Products</Link>
+          <Link href="/about">About Us</Link>
+          <Link href="/energy_calculator">Energy Calculator</Link>
         </nav>
       </div>
     </header>
