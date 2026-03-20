@@ -1,4 +1,6 @@
-import initialAppliances from "@/src/constants/initialAppliances";
+import initialAppliances, {
+  Appliance,
+} from "@/src/constants/initialAppliances";
 import { AppState } from "./AppState";
 
 export type Action =
@@ -19,7 +21,13 @@ export type Action =
       payload: { id: number; type: string };
     }
   | {
-      type: "RESET";
+      type: "RESET_APPLIANCES";
+    }
+  | {
+      type: "CLOSE_NAV_BAR";
+    }
+  | {
+      type: "OPEN_NAV_BAR";
     };
 
 const appReducer = (state: AppState, action: Action) => {
@@ -32,6 +40,7 @@ const appReducer = (state: AppState, action: Action) => {
       newAppliance[id].power = !Number(power) ? "0" : Number(power).toString();
       return {
         app: { ...state.app },
+        energy: { ...state.energy },
         appliances: newAppliance,
       };
     }
@@ -43,6 +52,7 @@ const appReducer = (state: AppState, action: Action) => {
       newAppliance[id].name = name || "";
       return {
         app: { ...state.app },
+        energy: { ...state.energy },
         appliances: newAppliance,
       };
     }
@@ -52,10 +62,16 @@ const appReducer = (state: AppState, action: Action) => {
       if (Number(quantity) > 99 || Number(quantity || !Number(quantity)) < 0)
         return state;
 
+      const totalWatt = state.appliances.reduce(
+        (prev, curr) => prev + Number(curr.power) * Number(curr.quantity),
+        0,
+      );
+
       const newAppliance = [...state.appliances];
       newAppliance[id].quantity = quantity?.toString() || "";
       return {
         app: { ...state.app },
+        energy: { totalWatt },
         appliances: newAppliance,
       };
     }
@@ -74,13 +90,45 @@ const appReducer = (state: AppState, action: Action) => {
 
       return {
         app: { ...state.app },
+        energy: { ...state.energy },
         appliances: newAppliance,
       };
     }
-    case "RESET": {
+    case "CLOSE_NAV_BAR": {
       return {
-        app: { navBar: false },
+        app: { navBar: false, step: 0 },
+        energy: { ...state.energy },
         appliances: [...initialAppliances],
+      };
+    }
+    case "OPEN_NAV_BAR": {
+      return {
+        app: { navBar: true, step: 0 },
+        energy: { ...state.energy },
+        appliances: [...initialAppliances],
+      };
+    }
+    case "RESET_APPLIANCES": {
+      const appliances = state.appliances.map((v) => {
+        const appliance: Appliance = {
+          hrs: "0",
+          isEditable: false,
+          isSelected: false,
+          name: v.variation ? v.variation[0].type : v.name,
+          power: v.variation ? v.variation[0].power : v.power,
+          quantity: "0",
+        };
+
+        if (v.variation) {
+          appliance["variation"] = v.variation;
+        }
+
+        return appliance;
+      });
+      return {
+        app: { navBar: false, step: 0 },
+        energy: { totalWatt: 0 },
+        appliances,
       };
     }
     default: {
