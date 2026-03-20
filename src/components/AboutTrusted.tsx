@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import companies from "../constants/conpanies";
+import { COMPANIES } from "../constants/systemConfigs";
 
 export default function AboutTrusted() {
   return (
@@ -13,8 +13,8 @@ export default function AboutTrusted() {
         </p>
 
         {/* LOGOS */}
-        <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-10 place-items-center">
-          {companies.map((company, index) => (
+        <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-10 place-items-center">
+          {COMPANIES.map((company, index) => (
             <div
               key={index}
               className="flex items-center justify-center opacity-70 hover:opacity-100 transition"
