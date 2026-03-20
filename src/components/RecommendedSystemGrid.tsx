@@ -1,58 +1,34 @@
 import { Battery, Gauge, MessageCircle, Sun, Wallet, Zap } from "lucide-react";
+import {
+  BATTERY_MAPPING,
+  PANEL_MAPPING,
+  POWER_FACTOR,
+  VA_STEPS,
+} from "../constants/systemConfigs";
 import useAppContext from "../hooks/useAppContext";
-
-const POWER_FACTOR = 0.8;
-
-const VA_STEPS = [
-  800, 1400, 3000, 3500, 5000, 10000, 15000, 20000, 30000, 50000,
-];
 
 const estimateVA = (va: number): number => {
   if (va <= 0) return 0;
-  return VA_STEPS.find((step) => va <= step) ?? 0;
+  const found = VA_STEPS.find((step) => va <= step);
+  return found ?? VA_STEPS[VA_STEPS.length - 1];
 };
 
 function RecommendedSystemGrid() {
   const { state } = useAppContext();
-  const { appliances } = state;
 
-  // Convert to VA
   const va = state.energy.totalWatt / POWER_FACTOR;
 
-  // Get recommended inverter size once
   const inverterVA = estimateVA(va);
 
-  // Format display
-  const inverterDisplay =
-    inverterVA >= 1000 ? `${inverterVA / 1000}KVA` : `${inverterVA}VA`;
+  // check if user exceeds supported range
+  const isAboveRange = va > VA_STEPS[VA_STEPS.length - 1];
 
-  const batteries = {
-    0: 0,
-    800: 1,
-    1400: 2,
-    3000: 4,
-    3500: 4,
-    5000: 8,
-    10000: 15,
-    15000: 30,
-    20000: 30,
-    30000: 30,
-    50000: 60,
-  };
-
-  const Panels = {
-    "0": 0,
-    "800": 6,
-    "1400": 8,
-    "3000": 10,
-    "3500": 12,
-    "5000": 14,
-    "10000": 16,
-    "15000": 18,
-    "20000": 20,
-    "30000": 22,
-    "50000": 24,
-  };
+  // display format
+  const inverterDisplay = isAboveRange
+    ? `${VA_STEPS[VA_STEPS.length - 1] / 1000}KVA+`
+    : inverterVA >= 1000
+      ? `${inverterVA / 1000}KVA`
+      : `${inverterVA}VA`;
 
   return (
     <div className="w-full">
@@ -72,7 +48,7 @@ function RecommendedSystemGrid() {
         <div className="bg-zinc-50 rounded-xl p-5 text-center shadow-sm hover:shadow-lg transition">
           <Sun className="mx-auto text-yellow-500 mb-2" size={28} />
           <p className="text-2xl font-bold text-zinc-800">
-            {Panels[estimateVA(va).toString()]}
+            {PANEL_MAPPING[inverterVA] ?? 0}
           </p>
           <p className="text-sm text-zinc-500">Solar Panels (500W - 700W)</p>
         </div>
@@ -88,7 +64,7 @@ function RecommendedSystemGrid() {
         <div className="bg-zinc-50 rounded-xl p-5 text-center shadow-sm hover:shadow-lg transition">
           <Battery className="mx-auto text-green-500 mb-2" size={28} />
           <p className="text-2xl font-bold text-zinc-800">
-            {batteries[estimateVA(va).toString()]}
+            {BATTERY_MAPPING[inverterVA] ?? 0}
           </p>
           <p className="text-sm text-zinc-500">Battery Bank (4.8kWh)</p>
         </div>
@@ -102,7 +78,7 @@ function RecommendedSystemGrid() {
       </div>
 
       {/* Estimated Cost */}
-      <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl p-6 text-center mb-8 shadow-lg">
+      <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl p-6 text-center mb-4 shadow-lg">
         <div className="flex justify-center mb-2">
           <Wallet className="text-white" size={26} />
         </div>
@@ -114,7 +90,14 @@ function RecommendedSystemGrid() {
         </p>
       </div>
 
-      {/* CTA */}
+      {/* Large Solar Notice */}
+      {isAboveRange && (
+        <p className="text-center text-sm text-zinc-600 mb-6">
+          Larger appliances or systems above this size require a custom setup.
+          Please consult us on WhatsApp for a tailored solution.
+        </p>
+      )}
+
       <button
         className="w-full flex items-center justify-center gap-2 
           bg-green-600 hover:bg-green-700 
