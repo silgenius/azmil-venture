@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import useAppContext from "../hooks/useAppContext";
 
 function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { state, dispatch } = useAppContext();
   return (
     <header className="sticky top-0 z-50 bg-gray-900 shadow-md">
       <nav
@@ -18,28 +18,41 @@ function Header() {
         </div>
 
         <div className="hidden md:flex md:gap-x-12">
-          <Link href="/home" className="text-base font-semibold text-white">
+          <Link
+            href="/home"
+            className="text-base font-semibold text-white"
+            onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}
+          >
             Home
           </Link>
 
-          <Link href="/products" className="text-base font-semibold text-white">
+          <Link
+            href="/products"
+            className="text-base font-semibold text-white"
+            onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}
+          >
             Products
           </Link>
 
-          <Link href="/about" className="text-base font-semibold text-white">
+          <Link
+            href="/about"
+            className="text-base font-semibold text-white"
+            onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}
+          >
             About Us
           </Link>
 
           <Link
             href="/energy_calculator"
             className="text-base font-semibold text-white"
+            onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}
           >
             Energy Calculator
           </Link>
         </div>
 
         <button
-          onClick={() => setMenuOpen(true)}
+          onClick={() => dispatch({ type: "OPEN_NAV_BAR" })}
           className="md:hidden text-white"
         >
           <svg
@@ -58,11 +71,11 @@ function Header() {
       </nav>
       <div
         className={`fixed top-0 right-0 h-full w-64 bg-gray-900 text-white transform transition-transform duration-300 ${
-          menuOpen ? "translate-x-0" : "translate-x-full"
+          state.app.navBar ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex justify-end p-6">
-          <button onClick={() => setMenuOpen(false)}>
+          <button onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -79,10 +92,30 @@ function Header() {
         </div>
 
         <nav className="flex flex-col space-y-6 px-6 text-lg font-semibold">
-          <Link href="/home">Home</Link>
-          <Link href="/products">Products</Link>
-          <Link href="/about">About Us</Link>
-          <Link href="/energy_calculator">Energy Calculator</Link>
+          <Link
+            href="/home"
+            onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}
+          >
+            Home
+          </Link>
+          <Link
+            href="/products"
+            onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}
+          >
+            Products
+          </Link>
+          <Link
+            href="/about"
+            onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}
+          >
+            About Us
+          </Link>
+          <Link
+            href="/energy_calculator"
+            onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}
+          >
+            Energy Calculator
+          </Link>
         </nav>
       </div>
     </header>
