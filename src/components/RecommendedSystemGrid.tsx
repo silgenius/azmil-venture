@@ -1,4 +1,5 @@
 import { Battery, Gauge, MessageCircle, Sun, Wallet, Zap } from "lucide-react";
+import Link from "next/link";
 import {
   BATTERY_MAPPING,
   PANEL_MAPPING,
@@ -16,7 +17,10 @@ const estimateVA = (va: number): number => {
 function RecommendedSystemGrid() {
   const { state } = useAppContext();
 
-  const va = state.energy.totalWatt / POWER_FACTOR;
+  const va =
+    state.config.systemType === "offgrid"
+      ? (state.energy.totalWatt / POWER_FACTOR) * 2
+      : state.energy.totalWatt / POWER_FACTOR;
 
   const inverterVA = estimateVA(va);
 
@@ -30,6 +34,43 @@ function RecommendedSystemGrid() {
       ? `${inverterVA / 1000}KVA`
       : `${inverterVA}VA`;
 
+  const KWhDisplay =
+    state.energy.totalWatt >= 1000
+      ? `${(state.energy.totalWatt / 1000).toFixed(2)}KWh`
+      : `${state.energy.totalWatt}Wh`;
+
+  const appliancesList = state.appliances?.length
+    ? state.appliances
+        .filter((item) => Number(item.power) * Number(item.quantity) > 0)
+        .map((item) => `- ${item.name} (× ${item.quantity})`)
+        .join("\n")
+    : "No appliances specified";
+
+  const message = `Hello, I would like a solar system quote.
+
+Details: 
+- Name: ${state.user.name}
+- Email: ${state.user.email}
+
+Here are my Appliances and Estimated requirements:
+
+Appliances ⚡:
+${appliancesList}
+
+Estimated Requirements 📝:
+- Inverter: ${inverterDisplay}
+- Solar Panels: ${PANEL_MAPPING[inverterVA] ?? 0}
+- Battery Bank: ${BATTERY_MAPPING[inverterVA] ?? 0}
+- Daily Energy: ${KWhDisplay}
+
+Config ⚙:
+- System Type: ${state.config.systemType === "ongrid" ? "On-Grid" : "Off-Grid"}
+- Daily Usage: ${state.config.dailyUsage} hr(s)
+
+Please provide a formal quote. Thank you.
+`;
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappLink = `https://wa.me/2348134936101?text=${encodedMessage}`;
   return (
     <div className="w-full">
       {/* Header */}
@@ -72,7 +113,7 @@ function RecommendedSystemGrid() {
         {/* Daily Energy */}
         <div className="bg-zinc-50 rounded-xl p-5 text-center shadow-sm hover:shadow-lg transition">
           <Gauge className="mx-auto text-purple-500 mb-2" size={28} />
-          <p className="text-2xl font-bold text-zinc-800">2.0kWh</p>
+          <p className="text-2xl font-bold text-zinc-800">{KWhDisplay}</p>
           <p className="text-sm text-zinc-500">Daily Energy</p>
         </div>
       </div>
@@ -90,7 +131,7 @@ function RecommendedSystemGrid() {
         </p>
       </div>
 
-      {/* Large Solar Notice */}
+      {/* Large Solar System Notice */}
       {isAboveRange && (
         <p className="text-center text-sm text-zinc-600 mb-6">
           Larger appliances or systems above this size require a custom setup.
@@ -98,14 +139,17 @@ function RecommendedSystemGrid() {
         </p>
       )}
 
-      <button
+      <Link
         className="w-full flex items-center justify-center gap-2 
           bg-green-600 hover:bg-green-700 
           text-white font-semibold py-3 rounded-xl transition shadow-md"
+        href={whatsappLink}
+        target="_blank"
+        rel="noopener noreferrer"
       >
         <MessageCircle size={18} />
         Get Formal Quote on WhatsApp
-      </button>
+      </Link>
     </div>
   );
 }

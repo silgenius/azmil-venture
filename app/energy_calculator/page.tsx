@@ -38,6 +38,10 @@ export default function EnergyCalculatorScreen() {
   }, [step]);
 
   const canProceed = state.energy.totalWatt > 0;
+  const isNextDisabled =
+    !canProceed ||
+    step === steps.length - 1 ||
+    (step === steps.length - 2 && !state.config.formIsValidated);
 
   const renderStep = () => {
     switch (step) {
@@ -53,11 +57,18 @@ export default function EnergyCalculatorScreen() {
   };
 
   const handleStepClick = (id: number) => {
+    if (
+      step === steps.length - 2 &&
+      !state.config.formIsValidated &&
+      id > steps.length - 2
+    )
+      return;
     if (!canProceed) return;
     setStep(id);
   };
 
   const handleNext = () => {
+    if (step === steps.length - 2 && !state.config.formIsValidated) return;
     if (!canProceed || step === steps.length - 1) return;
     setStep((prev) => prev + 1);
   };
@@ -112,7 +123,7 @@ export default function EnergyCalculatorScreen() {
             </button>
 
             <button
-              disabled={!canProceed || step === steps.length - 1}
+              disabled={isNextDisabled}
               onClick={handleNext}
               className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40"
             >
