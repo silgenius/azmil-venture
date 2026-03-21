@@ -14,7 +14,7 @@ export default function AboutMission() {
           </h2>
 
           <p className="mt-6 text-lg text-zinc-500 leading-8">
-            To enable people to reach their full potentials by ensuringn the
+            To enable people to reach their full potentials by ensuring the
             stability of light in their lives. Through innivative solar inverter
             solutions, we strive to eliminate the instability associated with
             traditional energy sourcs and empower individuals, businesses, and

@@ -2,29 +2,17 @@
 
 export default function AboutReviews() {
   return (
-    <section className="w-full py-20 px-6 md:px-16 bg-zinc-50">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12 items-center">
-        {/* LEFT SUMMARY */}
-        <div>
-          <h3 className="text-2xl md:text-3xl font-semibold tracking-tight text-zinc-900">
-            EXCELLENT
-          </h3>
+    <section className="w-full py-10 px-6 md:px-16 bg-zinc-50">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-4xl md:text-5xl font-[500] text-zinc-900 tracking-tight leading-tight">
+          Reviews
+        </h2>
+        <p className="mt-4 text-lg text-zinc-500 leading-relaxed">
+          See What people say about us
+        </p>
 
-          {/* Stars */}
-          <div className="mt-4 flex items-center gap-1 text-yellow-500 text-xl">
-            ★★★★★
-          </div>
-
-          <p className="mt-3 text-sm text-zinc-500">Based on 86 reviews</p>
-
-          <p className="mt-4 text-lg font-medium tracking-tight text-zinc-700">
-            Google
-          </p>
-        </div>
-
-        {/* REVIEWS */}
-        <div className="md:col-span-2 grid sm:grid-cols-2 gap-6">
-          {/* CARD */}
+        {/* REVIEWS GRID */}
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 my-4">
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-zinc-200" />
@@ -43,7 +31,6 @@ export default function AboutReviews() {
             </p>
           </div>
 
-          {/* CARD */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-zinc-200" />
@@ -60,6 +47,22 @@ export default function AboutReviews() {
             <p className="mt-4 text-zinc-600 leading-relaxed">
               Tested and trusted 💯
             </p>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-zinc-200" />
+              <div>
+                <p className="text-sm font-medium text-zinc-900">
+                  Abedayo Alejec
+                </p>
+                <p className="text-xs text-zinc-500">12 months ago</p>
+              </div>
+            </div>
+
+            <div className="mt-4 text-yellow-500 text-sm">★★★★★</div>
+
+            <p className="mt-4 text-zinc-600 leading-relaxed">I love it</p>
           </div>
         </div>
       </div>

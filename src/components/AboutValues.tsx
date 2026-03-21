@@ -33,8 +33,8 @@ export default function AboutValues() {
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
         <div className="max-w-2xl">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-zinc-900 leading-tight">
-            Our values
+          <h2 className="text-4xl md:text-5xl font-[500] text-zinc-900 tracking-tight leading-tight">
+            Our Values
           </h2>
           <p className="mt-4 text-lg text-zinc-500 leading-relaxed">
             These principles guide everything we do — from how we build systems
