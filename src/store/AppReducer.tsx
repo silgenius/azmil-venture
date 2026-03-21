@@ -1,6 +1,4 @@
-import initialAppliances, {
-  Appliance,
-} from "@/src/constants/initialAppliances";
+import { Appliance } from "@/src/constants/initialAppliances";
 import { AppState } from "./AppState";
 
 export type Action =
@@ -20,97 +18,96 @@ export type Action =
       type: "SET_APPLIANCE_VARIATION";
       payload: { id: number; type: string };
     }
-  | {
-      type: "RESET_APPLIANCES";
-    }
-  | {
-      type: "CLOSE_NAV_BAR";
-    }
-  | {
-      type: "OPEN_NAV_BAR";
-    };
+  | { type: "RESET_APPLIANCES" }
+  | { type: "CLOSE_NAV_BAR" }
+  | { type: "OPEN_NAV_BAR" }
+  | { type: "SET_CONFIG"; payload: Partial<AppState["config"]> }
+  | { type: "SET_USER"; payload: Partial<AppState["user"]> }
+  | { type: "SET_FORM_VALIDATION"; payload: { value: boolean } };
 
-const appReducer = (state: AppState, action: Action) => {
+// helper to update appliance immutably
+const updateAppliance = (
+  appliances: Appliance[],
+  id: number,
+  updater: (item: Appliance) => Appliance,
+) => appliances.map((item, index) => (index === id ? updater(item) : item));
+
+// helper to calculate total watt
+const calculateTotalWatt = (appliances: Appliance[]) =>
+  appliances.reduce((sum, a) => sum + Number(a.power) * Number(a.quantity), 0);
+
+const appReducer = (state: AppState, action: Action): AppState => {
   switch (action.type) {
     case "SET_APPLIANCE_POWER": {
-      const { power, id } = action.payload;
-      if (Number(power) < 0) return state;
+      const { id, power } = action.payload;
+      const value = Number(power);
+      if (value < 0) return state;
 
-      const newAppliance = [...state.appliances];
-      newAppliance[id].power = !Number(power) ? "0" : Number(power).toString();
-      return {
-        app: { ...state.app },
-        energy: { ...state.energy },
-        appliances: newAppliance,
-      };
+      const appliances = updateAppliance(state.appliances, id, (a) => ({
+        ...a,
+        power: (!value ? 0 : value).toString(),
+      }));
+
+      return { ...state, appliances };
     }
 
     case "SET_APPLIANCE_NAME": {
-      const { name, id } = action.payload;
+      const { id, name } = action.payload;
 
-      const newAppliance = [...state.appliances];
-      newAppliance[id].name = name || "";
-      return {
-        app: { ...state.app },
-        energy: { ...state.energy },
-        appliances: newAppliance,
-      };
+      const appliances = updateAppliance(state.appliances, id, (a) => ({
+        ...a,
+        name: name || "",
+      }));
+
+      return { ...state, appliances };
     }
 
     case "SET_APPLIANCE_QUANTITY": {
-      const { quantity, id } = action.payload;
-      if (Number(quantity) > 99 || Number(quantity || !Number(quantity)) < 0)
-        return state;
+      const { id, quantity } = action.payload;
+      const value = Number(quantity);
 
-      const totalWatt = state.appliances.reduce(
-        (prev, curr) => prev + Number(curr.power) * Number(curr.quantity),
-        0,
-      );
+      if (value < 0 || value > 99 || Number.isNaN(value)) return state;
 
-      const newAppliance = [...state.appliances];
-      newAppliance[id].quantity = quantity?.toString() || "";
+      const appliances = updateAppliance(state.appliances, id, (a) => ({
+        ...a,
+        quantity: value.toString(),
+      }));
+
       return {
-        app: { ...state.app },
-        energy: { totalWatt },
-        appliances: newAppliance,
+        ...state,
+        appliances,
+        energy: { totalWatt: calculateTotalWatt(appliances) },
       };
     }
 
     case "SET_APPLIANCE_VARIATION": {
-      const { type, id } = action.payload;
-      const newAppliance = [...state.appliances];
+      const { id, type } = action.payload;
 
-      const appliance = newAppliance[id];
-      const variation = appliance.variation?.find((v) => v.type === type);
+      const appliances = updateAppliance(state.appliances, id, (a) => {
+        const variation = a.variation?.find((v) => v.type === type);
+        if (!variation) return a;
 
-      if (variation) {
-        appliance.name = variation.type;
-        appliance.power = variation.power;
-      }
+        return {
+          ...a,
+          name: variation.type,
+          power: variation.power,
+        };
+      });
 
-      return {
-        app: { ...state.app },
-        energy: { ...state.energy },
-        appliances: newAppliance,
-      };
+      return { ...state, appliances };
     }
+
+    case "OPEN_NAV_BAR":
     case "CLOSE_NAV_BAR": {
       return {
-        app: { navBar: false, step: 0 },
-        energy: { ...state.energy },
-        appliances: [...initialAppliances],
+        ...state,
+        app: { navBar: action.type === "OPEN_NAV_BAR", step: 0 },
       };
     }
-    case "OPEN_NAV_BAR": {
-      return {
-        app: { navBar: true, step: 0 },
-        energy: { ...state.energy },
-        appliances: [...initialAppliances],
-      };
-    }
+
     case "RESET_APPLIANCES": {
       const appliances = state.appliances.map((v) => {
-        const appliance: Appliance = {
+        const base: Appliance = {
           hrs: "0",
           isEditable: false,
           isSelected: false,
@@ -119,21 +116,60 @@ const appReducer = (state: AppState, action: Action) => {
           quantity: "0",
         };
 
-        if (v.variation) {
-          appliance["variation"] = v.variation;
-        }
-
-        return appliance;
+        if (v.variation) base.variation = v.variation;
+        return base;
       });
+
       return {
         app: { navBar: false, step: 0 },
         energy: { totalWatt: 0 },
         appliances,
+        user: { name: "", email: "" },
+        config: { systemType: "", dailyUsage: 0, formIsValidated: false },
       };
     }
-    default: {
-      return state;
+
+    case "SET_CONFIG": {
+      const { dailyUsage } = action.payload;
+      if (
+        dailyUsage &&
+        (dailyUsage <= 0 || dailyUsage > 24 || Number.isNaN(dailyUsage))
+      )
+        return state;
+      const newState = {
+        ...state,
+        config: { ...state.config, ...action.payload },
+      };
+      if (
+        newState.user.name &&
+        newState.user.email &&
+        newState.config.dailyUsage &&
+        newState.config.systemType
+      )
+        state.config.formIsValidated = true;
+      else state.config.formIsValidated = false;
+
+      return newState;
     }
+
+    case "SET_USER": {
+      const newState = {
+        ...state,
+        user: { ...state.user, ...action.payload },
+      };
+      if (
+        newState.user.name &&
+        newState.user.email &&
+        newState.config.dailyUsage &&
+        newState.config.systemType
+      )
+        state.config.formIsValidated = true;
+      else state.config.formIsValidated = false;
+
+      return newState;
+    }
+    default:
+      return state;
   }
 };
 
