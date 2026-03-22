@@ -34,10 +34,9 @@ function RecommendedSystemGrid() {
       ? `${inverterVA / 1000}KVA`
       : `${inverterVA}VA`;
 
+  const wattHour = state.energy.totalWatt * state.config.dailyUsage;
   const KWhDisplay =
-    state.energy.totalWatt >= 1000
-      ? `${(state.energy.totalWatt / 1000).toFixed(2)}KWh`
-      : `${state.energy.totalWatt}Wh`;
+    wattHour >= 1000 ? `${(wattHour / 1000).toFixed(2)}KWh` : `${wattHour}Wh`;
 
   const appliancesList = state.appliances?.length
     ? state.appliances
