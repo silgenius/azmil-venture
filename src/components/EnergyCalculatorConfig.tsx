@@ -114,7 +114,7 @@ function EnergyCalculatorConfig() {
             />
           </div>
           <p className="text-xs text-zinc-500 mt-1">
-            We’ll send your report to this email
+            We would like to stay in touch with you with your email
           </p>
           {errors.email && (
             <p className="text-red-500 text-xs">{errors.email}</p>
