@@ -12,11 +12,12 @@ export default function Products() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [filter, setFilter] = useState("all");
+
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const savedCart = localStorage.getItem("azmil-cart");
-    if (savedCart) setCart(JSON.parse(savedCart));
+    const saved = localStorage.getItem("azmil-cart");
+    if (saved) setCart(JSON.parse(saved));
   }, []);
 
   useEffect(() => {
@@ -24,42 +25,51 @@ export default function Products() {
   }, [cart]);
 
   useEffect(() => {
-    const category = searchParams.get("category") || "all";
-    setFilter(category);
+    setFilter(searchParams.get("category") || "all");
   }, [searchParams]);
 
-  const filteredProducts = PRODUCTS.filter(
-    (p) => filter === "all" || p.category === filter,
-  );
+  const getQty = (productId: number) =>
+    cart.find((item) => item.product.id === productId)?.qty || 0;
 
   const addToCart = (product: Product) => {
-    const existing = cart.find((item) => item.product.id === product.id);
+    setCart((prev) => [...prev, { id: Date.now(), product, qty: 1 }]);
+  };
 
-    if (existing) {
-      setCart(
-        cart.map((item) =>
+  const increment = (product: Product) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        item.product.id === product.id ? { ...item, qty: item.qty + 1 } : item,
+      ),
+    );
+  };
+
+  const decrement = (product: Product) => {
+    setCart((prev) =>
+      prev
+        .map((item) =>
           item.product.id === product.id
-            ? { ...item, qty: item.qty + 1 }
+            ? { ...item, qty: item.qty - 1 }
             : item,
-        ),
-      );
-    } else {
-      setCart([...cart, { product, qty: 1, id: Date.now() }]);
-    }
+        )
+        .filter((item) => item.qty > 0),
+    );
   };
 
   const updateCart = (newCart: CartItem[]) => setCart(newCart);
 
   const categories = ["all", "panels", "inverters", "batteries", "packages"];
 
+  const filteredProducts = PRODUCTS.filter(
+    (p) => filter === "all" || p.category === filter,
+  );
   return (
     <>
       <main className="min-h-screen bg-gray-50">
-        {/* Sticky Filter + Cart */}
-        <div className="bg-white border-b sticky top-[65px] z-40 shadow-sm">
+        {/* HEADER */}
+        <div className="bg-white border-b sticky top-[90px] z-40 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16">
             <div className="flex items-center justify-between gap-4 py-4">
-              {/* Categories */}
+              {/* CATEGORIES */}
               <div className="flex gap-2 overflow-x-auto no-scrollbar">
                 {categories.map((cat) => (
                   <Link
@@ -77,7 +87,7 @@ export default function Products() {
                 ))}
               </div>
 
-              {/* Cart */}
+              {/* CART BUTTON */}
               <button
                 onClick={() => setCartOpen(true)}
                 className="relative flex items-center gap-2 bg-gradient-to-r from-green-500 to-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition shrink-0"
@@ -94,19 +104,22 @@ export default function Products() {
           </div>
         </div>
 
-        {/* Products */}
+        {/* PRODUCTS GRID */}
         <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-12 md:py-16">
           {filteredProducts.length === 0 ? (
             <div className="text-center py-32">
               <div className="w-32 h-32 bg-gray-200 rounded-3xl mx-auto mb-8 flex items-center justify-center">
                 🔍
               </div>
+
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
                 No Products Found
               </h2>
+
               <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
                 Try adjusting your filters or contact us for custom solutions.
               </p>
+
               <Link
                 href="https://wa.me/2348134936101"
                 className="bg-green-500 text-white px-8 py-4 rounded-2xl text-xl font-bold hover:bg-green-600"
@@ -116,56 +129,81 @@ export default function Products() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
-                >
-                  {/* Image */}
-                  <div className="relative h-56 sm:h-60 bg-gradient-to-br from-gray-50 to-gray-100">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      className="object-cover hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
+              {filteredProducts.map((product) => {
+                const qty = getQty(product.id);
 
-                  {/* Content */}
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
-                      {product.name}
-                    </h3>
+                return (
+                  <div
+                    key={product.id}
+                    className="bg-white rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+                  >
+                    {/* IMAGE */}
+                    <div className="relative h-56 sm:h-60 bg-gradient-to-br from-gray-50 to-gray-100">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="object-cover hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
 
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                      {product.description}
-                    </p>
+                    {/* CONTENT */}
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                        {product.name}
+                      </h3>
 
-                    <ul className="space-y-1 mb-4 text-sm text-gray-500">
-                      {product.specs.slice(0, 3).map((spec, i) => (
-                        <li key={i} className="flex gap-2">
-                          <span>•</span>
-                          {spec}
-                        </li>
-                      ))}
-                    </ul>
+                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                        {product.description}
+                      </p>
 
-                    {/* Bottom */}
-                    <div className="mt-auto">
-                      <div className="text-xl font-bold text-green-600 mb-4">
-                        {formatPrice(product.price)}
+                      <ul className="space-y-1 mb-4 text-sm text-gray-500">
+                        {product.specs.slice(0, 3).map((spec, i) => (
+                          <li key={i} className="flex gap-2">
+                            <span>•</span>
+                            {spec}
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* FOOTER */}
+                      <div className="mt-auto">
+                        <div className="text-xl font-bold text-green-600 mb-4">
+                          {formatPrice(product.price)}
+                        </div>
+
+                        {/* CART ACTION */}
+                        {qty === 0 ? (
+                          <button
+                            onClick={() => addToCart(product)}
+                            className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white py-3 rounded-xl font-semibold transition"
+                          >
+                            Add to Cart
+                          </button>
+                        ) : (
+                          <div className="flex items-center justify-between bg-gray-100 rounded-xl overflow-hidden">
+                            <button
+                              onClick={() => decrement(product)}
+                              className="px-4 py-3 text-lg font-bold hover:bg-gray-200"
+                            >
+                              −
+                            </button>
+
+                            <span className="font-semibold text-lg">{qty}</span>
+
+                            <button
+                              onClick={() => increment(product)}
+                              className="px-4 py-3 text-lg font-bold hover:bg-gray-200"
+                            >
+                              +
+                            </button>
+                          </div>
+                        )}
                       </div>
-
-                      <button
-                        onClick={() => addToCart(product)}
-                        className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white py-3 rounded-xl font-semibold transition"
-                      >
-                        Add to Cart
-                      </button>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -182,9 +220,11 @@ export default function Products() {
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Need Help Choosing?
           </h2>
+
           <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
             Meet our experts for free advice & custom quotes
           </p>
+
           <Link
             href="https://wa.me/2348134936101"
             className="bg-white text-green-600 px-10 py-5 rounded-3xl text-2xl font-bold hover:bg-gray-100 transition shadow-2xl"
@@ -194,6 +234,7 @@ export default function Products() {
         </div>
       </main>
 
+      {/* CART DRAWER */}
       {cartOpen && (
         <CartDrawer
           cart={cart}
