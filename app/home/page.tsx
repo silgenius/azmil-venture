@@ -82,7 +82,7 @@ export default function Home() {
                 className="text-3xl md:text-4xl font-bold text-yellow-400 mb-2 animate-on-scroll"
                 data-scroll-reveal
                 data-count-target="25"
-                data-count-text="Years"
+                data-count-text="1+"
               >
                 Years
               </div>
@@ -106,7 +106,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div
             data-scroll-reveal
-            animate-on-scroll
+            animate-on-scroll={"true"}
             className="flex flex-col items-center"
           >
             <div className="text-2xl md:text-3xl font-bold mb-1">
@@ -116,7 +116,7 @@ export default function Home() {
           </div>
           <div
             data-scroll-reveal
-            animate-on-scroll
+            animate-on-scroll={"true"}
             className="flex flex-col items-center"
           >
             <div className="text-2xl md:text-3xl font-bold mb-1">
