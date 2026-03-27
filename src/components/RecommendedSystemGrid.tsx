@@ -50,6 +50,7 @@ function RecommendedSystemGrid() {
 Details: 
 - Name: ${state.user.name}
 - Email: ${state.user.email}
+- Address: ${state.user.address}
 
 Here are my Appliances and Estimated requirements:
 
@@ -64,6 +65,7 @@ Estimated Requirements 📝:
 
 Config ⚙:
 - System Type: ${state.config.systemType === "ongrid" ? "On-Grid" : "Off-Grid"}
+- Battery Type: ${state.config.batteryType === "lithium" ? state.config.batteryType + "Battery" : state.config.batteryType + "Cell"}
 - Daily Usage: ${state.config.dailyUsage} hr(s)
 
 Please provide a formal quote. Thank you.
@@ -106,7 +108,7 @@ Please provide a formal quote. Thank you.
           <p className="text-2xl font-bold text-zinc-800">
             {BATTERY_MAPPING[inverterVA] ?? 0}
           </p>
-          <p className="text-sm text-zinc-500">Battery Bank (4.8kWh)</p>
+          <p className="text-sm text-zinc-500">Battery Bank (KWh)</p>
         </div>
 
         {/* Daily Energy */}
