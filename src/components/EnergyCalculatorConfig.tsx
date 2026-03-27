@@ -1,7 +1,5 @@
-"use client";
-
 import useAppContext from "@/src/hooks/useAppContext";
-import { Clock, Mail, Settings, User } from "lucide-react";
+import { Battery, Clock, Mail, MapPin, Settings, User } from "lucide-react";
 import { useState } from "react";
 
 function EnergyCalculatorConfig() {
@@ -10,8 +8,10 @@ function EnergyCalculatorConfig() {
   interface ErrorState {
     name?: string;
     email?: string;
+    address?: string;
     systemType?: string;
     dailyUsage?: string;
+    batteryType?: string;
   }
 
   const [errors, setErrors] = useState<ErrorState>({});
@@ -38,6 +38,14 @@ function EnergyCalculatorConfig() {
         else if (Number(value) <= 0) message = "Must be greater than 0";
         break;
 
+      case "address":
+        if (!value) message = "Home address is required";
+        break;
+
+      case "batteryType":
+        if (!value) message = "Select a battery type";
+        break;
+
       default:
         break;
     }
@@ -48,21 +56,21 @@ function EnergyCalculatorConfig() {
     }));
   };
 
-  const handleUserChange = (field: "name" | "email", value: string) => {
+  const handleUserChange = (
+    field: "name" | "email" | "address",
+    value: string,
+  ) => {
     dispatch({ type: "SET_USER", payload: { [field]: value } });
-
     setErrors((prev: any) => ({ ...prev, [field]: "" }));
   };
 
   const handleSystemChange = (
-    field: "systemType" | "dailyUsage",
+    field: "systemType" | "dailyUsage" | "batteryType",
     value: string,
   ) => {
     dispatch({ type: "SET_CONFIG", payload: { [field]: value } });
-
     setErrors((prev: any) => ({ ...prev, [field]: "" }));
   };
-
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       <h2 className="text-2xl font-bold text-center text-zinc-800">
@@ -96,6 +104,33 @@ function EnergyCalculatorConfig() {
           </div>
           {errors.name && (
             <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+          )}
+        </div>
+
+        {/* ADDRESS */}
+        <div>
+          <label className="text-sm font-medium text-zinc-600">
+            Home Address
+          </label>
+
+          <div className="relative mt-1">
+            <MapPin className="absolute left-3 top-3 text-zinc-400" size={18} />
+            <input
+              type="text"
+              placeholder="123 Main Street, City"
+              value={state.user.address || ""}
+              onChange={(e) => handleUserChange("address", e.target.value)}
+              onBlur={(e) => validateField("address", e.target.value)}
+              className={`w-full pl-10 pr-3 py-2 border rounded-xl outline-none transition
+      ${
+        errors.address
+          ? "border-red-500 focus:ring-red-500"
+          : "border-zinc-300 focus:ring-blue-500"
+      } focus:ring-2`}
+            />
+          </div>
+          {errors.address && (
+            <p className="text-red-500 text-xs mt-1">{errors.address}</p>
           )}
         </div>
 
@@ -163,6 +198,40 @@ function EnergyCalculatorConfig() {
           </div>
           {errors.systemType && (
             <p className="text-red-500 text-xs mt-1">{errors.systemType}</p>
+          )}
+        </div>
+
+        {/* BATTERY TYPE */}
+        <div>
+          <label className="text-sm font-medium text-zinc-600">
+            Battery Type
+          </label>
+          <div className="relative mt-1">
+            <Battery
+              className="absolute left-3 top-3 text-zinc-400"
+              size={18}
+            />
+            <select
+              value={state.config.batteryType || ""}
+              onChange={(e) =>
+                handleSystemChange("batteryType", e.target.value)
+              }
+              onBlur={(e) => validateField("batteryType", e.target.value)}
+              className={`w-full pl-10 pr-3 py-2 border rounded-xl bg-white outline-none transition
+      ${
+        errors.batteryType
+          ? "border-red-500 focus:ring-red-500"
+          : "border-zinc-300 focus:ring-blue-500"
+      } focus:ring-2`}
+            >
+              <option value="">Select battery type</option>
+              <option value="wet">Wet Cell</option>
+              <option value="dry">Dry Cell</option>
+              <option value="lithium">Lithium</option>
+            </select>
+          </div>
+          {errors.batteryType && (
+            <p className="text-red-500 text-xs mt-1">{errors.batteryType}</p>
           )}
         </div>
 
