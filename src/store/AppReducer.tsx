@@ -32,6 +32,19 @@ const updateAppliance = (
   updater: (item: Appliance) => Appliance,
 ) => appliances.map((item, index) => (index === id ? updater(item) : item));
 
+const isFormValid = (state: AppState): boolean => {
+  const { user, config } = state;
+
+  return Boolean(
+    user.name &&
+    user.email &&
+    user.address &&
+    config.systemType &&
+    config.dailyUsage &&
+    config.batteryType,
+  );
+};
+
 // helper to calculate total watt
 const calculateTotalWatt = (appliances: Appliance[]) =>
   appliances.reduce((sum, a) => sum + Number(a.power) * Number(a.quantity), 0);
@@ -124,8 +137,13 @@ const appReducer = (state: AppState, action: Action): AppState => {
         app: { navBar: false, step: 0 },
         energy: { totalWatt: 0 },
         appliances,
-        user: { name: "", email: "" },
-        config: { systemType: "", dailyUsage: 0, formIsValidated: false },
+        user: { name: "", email: "", address: "" },
+        config: {
+          systemType: "",
+          dailyUsage: 0,
+          batteryType: "",
+          formIsValidated: false,
+        },
       };
     }
 
@@ -140,14 +158,8 @@ const appReducer = (state: AppState, action: Action): AppState => {
         ...state,
         config: { ...state.config, ...action.payload },
       };
-      if (
-        newState.user.name &&
-        newState.user.email &&
-        newState.config.dailyUsage &&
-        newState.config.systemType
-      )
-        state.config.formIsValidated = true;
-      else state.config.formIsValidated = false;
+
+      newState.config.formIsValidated = isFormValid(newState);
 
       return newState;
     }
@@ -157,17 +169,11 @@ const appReducer = (state: AppState, action: Action): AppState => {
         ...state,
         user: { ...state.user, ...action.payload },
       };
-      if (
-        newState.user.name &&
-        newState.user.email &&
-        newState.config.dailyUsage &&
-        newState.config.systemType
-      )
-        state.config.formIsValidated = true;
-      else state.config.formIsValidated = false;
+      newState.config.formIsValidated = isFormValid(newState);
 
       return newState;
     }
+
     default:
       return state;
   }
