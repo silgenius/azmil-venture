@@ -12,14 +12,14 @@ function Header() {
         className="flex items-center justify-between p-6 lg:px-8"
       >
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+          <a href="/" className="-m-1.5 p-1.5">
             <img src="/logo3.png" alt="logo" className="lg:h-11 h-8 w-auto" />
           </a>
         </div>
 
         <div className="hidden md:flex md:gap-x-12">
           <Link
-            href="/home"
+            href="/"
             className="text-base font-semibold text-white"
             onClick={() => dispatch({ type: "CLOSE_NAV_BAR" })}
           >
