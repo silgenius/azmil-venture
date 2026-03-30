@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function AboutTrusted() {
   return (
-    <section className="w-full py-16 px-6 md:px-16 bg-white">
+    <section className="w-full py-10 md:py-12 px-6 md:px-16 bg-zinc-100">
       <div className="max-w-6xl mx-auto text-center">
         {/* HEADING */}
         <p className="text-lg text-zinc-500 font-medium tracking-tight">
