@@ -57,6 +57,9 @@ export function EnergyCalculatorScreen() {
   };
 
   const handleStepClick = (id: number) => {
+    if (id === 2 && !state.config.formIsValidated) {
+      return;
+    }
     if (
       step === steps.length - 2 &&
       !state.config.formIsValidated &&
