@@ -1,7 +1,7 @@
 "use client";
 
-import { COMPANIES } from "@/src/constants/systemConfigs";
 import Image from "next/image";
+import partners from "../constants/partners";
 
 export default function AboutTrusted() {
   return (
@@ -14,7 +14,7 @@ export default function AboutTrusted() {
 
         {/* LOGOS */}
         <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-10 place-items-center">
-          {COMPANIES.map((company, index) => (
+          {partners.map((company, index) => (
             <div
               data-scroll-reveal
               animate-on-scroll={"true"}
