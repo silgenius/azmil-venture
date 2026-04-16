@@ -4,6 +4,7 @@ import { AppProvider } from "@/src/store/AppProvider";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +24,6 @@ export const metadata: Metadata = {
   },
   description:
     "AZMIL Power provides reliable solar energy solutions in Nigeria. We offer solar panels, inverters, batteries, and complete solar installations for homes and businesses.",
-
   keywords: [
     "solar energy Nigeria",
     "solar panels Lagos",
@@ -33,11 +33,9 @@ export const metadata: Metadata = {
     "AZMIL Power",
     "AZMIL Solar",
   ],
-
   authors: [{ name: "AZMIL Power" }],
   creator: "AZMIL Power",
   publisher: "AZMIL Power",
-
   openGraph: {
     title: "AZMIL Power | Solar Energy Solutions",
     description:
@@ -55,7 +53,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-
   twitter: {
     card: "summary_large_image",
     title: "AZMIL Power | Solar Energy Solutions",
@@ -63,23 +60,20 @@ export const metadata: Metadata = {
       "Affordable solar solutions for homes and businesses in Nigeria.",
     images: ["/og-image.png"],
   },
-
   icons: {
     icon: "/favicon.ico",
   },
-
   alternates: {
     canonical: "https://azmilsolar.com",
   },
-
   category: "energy",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
@@ -88,7 +82,9 @@ export default function RootLayout({
         <AppProvider>
           <Header />
           {children}
+          <Footer />
           <Analytics />
+
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
@@ -107,7 +103,6 @@ export default function RootLayout({
               }),
             }}
           />
-          <Footer />
         </AppProvider>
       </body>
     </html>
